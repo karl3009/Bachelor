@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Project - Planar Reflection </title>
+    <script type="text/javascript" src="../tools/MV.js"></script>
+    <script type="text/javascript" src="js.js"></script>
+    <script type="text/javascript" src="../tools/OBJParser.js"></script>
+
+    <script type="text/javascript" src="../tools/genmipmap.js"></script>
+
+    <script id="wgsl" type="wgsl" src="wgsl.wgsl"></script>
+
+
+</head>
+
+<body>
+    <canvas id="my-canvas" width="512" height="512">
+        Please use a Chrome as your browser.
+    </canvas>
+    <br>
+    <button type="button" , id="TransButton">Translate</button>
+    <button type="button" , id="RotateButton">Rotate</button>
+    <button type="button" , id="lockButton">Lock view </button>
+    <br>
+    <button type="button" , id="AnimateButton">Animate </button>
+    <button type="button" , id="NextFrameButton">Next Frame </button>
+
+    <div class="slidecontainer">
+        <p>Object Scale <br> (x-val ; y-val ; z-val) <br> ( <span id="xscale"></span> ; <span id="yscale"></span> ; <span
+                id="zscale"></span>)</p>
+        <input type="range" min="5" max="30" value="10" class="slider" id="xscale_range">
+        <input type="range" min="5" max="30" value="10" class="slider" id="yscale_range">
+        <input type="range" min="5" max="30" value="10" class="slider" id="zscale_range">
+
+        
+        <script>
+            var xscale_slider = document.getElementById("xscale_range");
+            var xscale_output = document.getElementById("xscale");
+            xscale_output.innerHTML = (xscale_slider.value / 10).toFixed(2);
+
+            xscale_slider.oninput = function () {
+                xscale_output.innerHTML = (this.value / 10).toFixed(2);
+            }
+        </script>
+
+        <script>
+            var yscale_slider = document.getElementById("yscale_range");
+            var yscale_output = document.getElementById("yscale");
+            yscale_output.innerHTML = (yscale_slider.value / 10).toFixed(2);
+
+            yscale_slider.oninput = function () {
+                yscale_output.innerHTML = (this.value / 10).toFixed(2);
+            }
+        </script>
+        
+        <script>
+            var zscale_slider = document.getElementById("zscale_range");
+            var zscale_output = document.getElementById("zscale");
+            zscale_output.innerHTML = (zscale_slider.value / 10).toFixed(2);
+
+            zscale_slider.oninput = function () {
+                zscale_output.innerHTML = (this.value / 10).toFixed(2);
+            }
+        </script>
+
+        <p>Blur: (<span id="blurscale"></span> )</p>
+            <input type="range" min="10" max="80" value="35" class="slider" id="blurscale_range">
+
+        <script>
+            var blurscale_slider = document.getElementById("blurscale_range");
+            var blurscale_output = document.getElementById("blurscale");
+            blurscale_output.innerHTML = (blurscale_slider.value / 10).toFixed(2);
+
+            blurscale_slider.oninput = function () {
+                blurscale_output.innerHTML = (this.value / 10).toFixed(2);
+            }
+        </script>
+    </div>
+
+
+</body>
+
+</html>

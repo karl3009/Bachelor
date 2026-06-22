@@ -1,0 +1,160 @@
+<!-- 
+ // Most of the code in this file is from 
+// "02562 Rendering - Introduction, Fall 2025 " 
+-->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Ray tracing version</title>
+    <script type="text/javascript" src="../tools/MV.js"></script>
+    <script type="text/javascript" src="js.js"></script>
+    <script type="text/javascript" src="../tools/bsptree/OBJParser_interleaved.js"></script>
+    <script type="text/javascript" src="../tools/bsptree/Aabb.js"></script>
+    <script type="text/javascript" src="../tools/bsptree/BspTree_interleaved.js"></script>
+    <script type="text/javascript" src="../tools/bsptree/TimingHelper.js"></script>
+
+    <script type="text/javascript" src="../tools/genmipmap.js"></script>
+
+
+    <script id="wgsl" type="x-shader" src="wgsl.wgsl"></script>
+</head>
+
+<body>
+    <canvas id="my-canvas" width="512" height="512">
+        Please use a browser that supports HTML5 canvas.
+    </canvas>
+    <br>
+    <button type="button" , id="reload">Reload</button> Load time : <output id="gputime">0</output> MS
+    <br>
+    <button type="button" , id="progressiveUpdateButton">Progressive Update</button>
+    <output id="progressive">true</output>
+    <br>
+    Plane : OBJECT : Mirror
+    <br>
+    <select id="PlaneMenu" size="6">
+        <option value="0"selected>Base color</option>
+        <option value="1">lambertian</option>
+        <option value="2">Phong</option>
+        <option value="3">Mirror</option>
+        <option value="4">Refract</option>
+        <option value="5">Glossy</option>
+        <option value="6">Transperent</option>
+        <option value="7">xxx</option>
+    </select>
+
+    <select id="ObjMenu" size="6">
+        <option value="0">Base color</option>
+        <option value="1">lambertian</option>
+        <option value="2">Phong</option>
+        <option value="3">Mirror</option>
+        <option value="4">Refract</option>
+        <option value="5"selected>Glossy</option>
+        <option value="6">Transperent</option>
+        <option value="7">xxx</option>
+    </select>
+
+    <select id="MirrorMenu" size="6">
+        <option value="0">Base color</option>
+        <option value="1">lambertian</option>
+        <option value="2">Phong</option>
+        <option value="3"selected>Mirror</option>
+        <option value="4">Refract</option>
+        <option value="5">Glossy</option>
+        <option value="6">Transperent</option>
+        <option value="7">xxx</option>
+    </select>
+    <br>
+
+    <div class="slidecontainer">
+        <p>Camara settings (x-pos ; ypos ; zpos) : ( <span id="xpos"></span> ; <span id="ypos"></span> ; <span
+                id="zpos"></span>)</p>
+
+        <!-- <input type="range" min="-150" max="150" value="-50" class="slider" id="xpos_range">
+        <input type="range" min="-150" max="150" value="35" class="slider" id="ypos_range">
+        <input type="range" min="-300" max="300" value="120" class="slider" id="zpos_range"> -->
+
+        <input type="range" min="-150" max="150" value="0" class="slider" id="xpos_range">
+        <input type="range" min="-150" max="150" value="35" class="slider" id="ypos_range">
+        <input type="range" min="-300" max="300" value="150" class="slider" id="zpos_range">
+
+        <p><span style="display: inline-block;">(Zoom ; Blur ; Gamma) :
+        (   <span id="camConst"></span> ;
+            <span id="texScaleConst"></span> ; 
+            <span id="gammaConst"></span>)
+        </p>
+
+        <input type="range" min="1" max="500" value="10" class="slider" id="camConst_range">
+        <input type="range" min="0" max="50" value="5" class="slider" id="texScale_range">
+        <input type="range" min="0" max="100" value="12" class="slider" id="gamma_range">
+
+
+
+
+        <script>
+            var xpos_slider = document.getElementById("xpos_range");
+            var xpos_output = document.getElementById("xpos");
+            xpos_output.innerHTML = (xpos_slider.value / 10).toFixed(2);
+
+            xpos_slider.oninput = function () {
+                xpos_output.innerHTML = (this.value / 10).toFixed(1);
+            }
+        </script>
+
+        <script>
+            var ypos_slider = document.getElementById("ypos_range");
+            var ypos_output = document.getElementById("ypos");
+            ypos_output.innerHTML = (ypos_slider.value / 10);
+
+            ypos_slider.oninput = function () {
+                ypos_output.innerHTML = (this.value / 10).toFixed(1);
+            }
+        </script>
+
+        <script>
+            var zpos_slider = document.getElementById("zpos_range");
+            var zpos_output = document.getElementById("zpos");
+            zpos_output.innerHTML = (zpos_slider.value / 10).toFixed(2);
+
+            zpos_slider.oninput = function () {
+                zpos_output.innerHTML = (this.value / 10).toFixed(1);
+            }
+        </script>
+        <script>
+            var camConst_slider = document.getElementById("camConst_range");
+            var camConst_output = document.getElementById("camConst");
+            camConst_output.innerHTML = (camConst_slider.value / 10).toFixed(1);
+
+            camConst_slider.oninput = function () {
+                camConst_output.innerHTML = (this.value / 10).toFixed(1);
+            }
+        </script>
+
+        <script>
+            var texScale_slider = document.getElementById("texScale_range");
+            var texScale_output = document.getElementById("texScaleConst");
+            texScale_output.innerHTML = (texScale_slider.value / 100).toFixed(2);
+
+            texScale_slider.oninput = function () {
+                texScale_output.innerHTML = (this.value / 100).toFixed(2);
+            }
+        </script>
+
+        <script>
+            var gamma_slider = document.getElementById("gamma_range");
+            var gamma_output = document.getElementById("gammaConst");
+            gamma_output.innerHTML = (gamma_slider.value / 10).toFixed(1);
+
+            gamma_slider.oninput = function () {
+                gamma_output.innerHTML = (this.value / 10).toFixed(1);
+            }
+        </script>
+        
+
+
+
+    </div>
+</body>
+
+</html>
