@@ -6,6 +6,9 @@ This repository contains the code for my bachelor thesis at Technical University
 #### Repository structure
 - Real-time
     - Contains the real time implementation of the scene described in the thesis.
+    - Controls: (WASD + L shirt + Space) for camera position, (Arrow keys) for look at direction
+    - "Animate" button: If the teapot is currently black, or there is no response to keyboard inputs. Then press "Animate" to continually cycle though the render passes or press the "Next Frame" to run one cycle of the render passes
+    - "Lock view" button: locks the look at position the same position as the pre-rendered version. 
 - Pre-rendered
     -  Contains the code for a implementation of a pre-rendered scene. The scene is equivalent to the scene in the real-time implementation
     - The majority of the code in this folder is written during the DTU course "02562 Rendering - Introduction, Fall 2025”, with the exception of the glossy function, with the exception of implementation of the glossy shader, creation of the scene and the addition of having a environment map, as the skybox 
