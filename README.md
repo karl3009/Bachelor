@@ -38,6 +38,8 @@ Guide from DTU courses "02562 Rendering - Introduction, Fall 2025” and "02561 
 
 When the server is open your browser and go to:  http://localhost:8000/, then navigate to relevant folder and open the "html.html" file.
 
+An alternative method to run the project is to use the Visual Studio Code extension "Live Preview" by Microsoft. 
+
 ##### Notes
 
 For syntax in wgsl code use "WGSL Language Support" by Noah Labrecque, it does not support the function "primitive_index" which is used in real-time implementation
